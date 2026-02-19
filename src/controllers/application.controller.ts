@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { applicationService } from "../services/application.service";
 import { sendSuccess } from "../utils/response";
+import { ApplicationStatus } from "@prisma/client";
 
 /**
  * Controller for Application module.
@@ -27,12 +28,13 @@ export class ApplicationController {
      */
     async getByJob(req: Request, res: Response, next: NextFunction) {
         try {
-            const { jobId, page, limit } = req.query;
+            const { jobId, page, limit, status } = req.query;
 
             const { applications, pagination } = await applicationService.getApplicationsByJob(
                 jobId as string,
                 page ? parseInt(page as string) : 1,
-                limit ? parseInt(limit as string) : 10
+                limit ? parseInt(limit as string) : 10,
+                status as ApplicationStatus
             );
 
             sendSuccess(res, applications, 200, pagination);

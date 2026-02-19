@@ -20,6 +20,10 @@ const router = Router();
  *     responses:
  *       201:
  *         description: Job created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiResponse'
  */
 router.post(
     "/",
@@ -36,6 +40,10 @@ router.post(
  *     responses:
  *       200:
  *         description: List of jobs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiResponse'
  */
 router.get("/", jobController.getAll);
 
@@ -54,6 +62,10 @@ router.get("/", jobController.getAll);
  *     responses:
  *       200:
  *         description: Job found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiResponse'
  *       404:
  *         description: Job not found
  */

@@ -30,38 +30,6 @@ const options: swaggerJsdoc.Options = {
             schemas: {
                 // Reusable response wrapper
                 ApiResponse: {
-                            Candidate: {
-            type: "object",
-            required: ["name", "skill", "experience", "languageScore", "documentsVerified"],
-            properties: {
-                name: { type: "string", example: "Your name here" },
-                skill: { type: "string", example: "Your skill (e.g., Electrician / Welder / Plumber)" },
-                experience: { type: "integer", example: 0 },
-                languageScore: { type: "integer", example: 0 },
-                documentsVerified: { type: "boolean", example: false }
-            }
-        },
-
-        Job: {
-            type: "object",
-            required: ["title", "country", "minExperience", "minLanguageScore"],
-            properties: {
-                title: { type: "string", example: "Job title (e.g., Construction Worker)" },
-                country: { type: "string", example: "Country name" },
-                minExperience: { type: "integer", example: 0 },
-                minLanguageScore: { type: "integer", example: 0 }
-            }
-        },
-
-        Application: {
-            type: "object",
-            required: ["candidateId", "jobId"],
-            properties: {
-                candidateId: { type: "integer", example: 1 },
-                jobId: { type: "integer", example: 1 }
-            }
-        },
-
                     type: "object",
                     properties: {
                         success: { type: "boolean" },
@@ -78,71 +46,66 @@ const options: swaggerJsdoc.Options = {
                         },
                     },
                 },
-                        Candidate: {
-            type: "object",
-            required: ["name", "skill", "experience", "languageScore", "documentsVerified"],
-            properties: {
-                name: {
+                Candidate: {
+                    type: "object",
+                    required: ["name", "skill", "experience", "languageScore", "documentsVerified"],
+                    properties: {
+                        id: { type: "integer", example: 1 },
+                        name: { type: "string", example: "John Doe" },
+                        skill: { type: "string", example: "Electrician" },
+                        experience: { type: "integer", example: 5 },
+                        languageScore: { type: "integer", example: 85 },
+                        documentsVerified: { type: "boolean", example: true },
+                        createdAt: { type: "string", format: "date-time" }
+                    }
+                },
+                Job: {
+                    type: "object",
+                    required: ["title", "country", "minExperience", "minLanguageScore"],
+                    properties: {
+                        id: { type: "integer", example: 1 },
+                        title: { type: "string", example: "Construction Worker" },
+                        country: { type: "string", example: "Germany" },
+                        minExperience: { type: "integer", example: 2 },
+                        minLanguageScore: { type: "integer", example: 60 },
+                        createdAt: { type: "string", format: "date-time" }
+                    }
+                },
+                JobInput: {
+                    type: "object",
+                    required: ["title", "country", "minExperience", "minLanguageScore"],
+                    properties: {
+                        title: { type: "string", example: "Electrician" },
+                        country: { type: "string", example: "UAE" },
+                        minExperience: { type: "integer", example: 0 },
+                        minLanguageScore: { type: "integer", example: 0 }
+                    }
+                },
+                ApplicationStatus: {
                     type: "string",
-                    example: "Your name here"
+                    enum: ["ELIGIBLE", "REJECTED", "SHORTLISTED"],
+                    example: "SHORTLISTED"
                 },
-                skill: {
-                    type: "string",
-                    example: "Electrician / Welder / Plumber"
+                Application: {
+                    type: "object",
+                    properties: {
+                        id: { type: "integer", example: 1 },
+                        candidateId: { type: "integer", example: 1 },
+                        jobId: { type: "integer", example: 1 },
+                        eligibilityScore: { type: "number", format: "float", example: 25.5 },
+                        status: { $ref: "#/components/schemas/ApplicationStatus" },
+                        createdAt: { type: "string", format: "date-time" },
+                        candidate: { $ref: "#/components/schemas/Candidate" }
+                    }
                 },
-                experience: {
-                    type: "integer",
-                    example: 0
-                },
-                languageScore: {
-                    type: "integer",
-                    example: 0
-                },
-                documentsVerified: {
-                    type: "boolean",
-                    example: false
+                ApplicationInput: {
+                    type: "object",
+                    required: ["candidateId", "jobId"],
+                    properties: {
+                        candidateId: { type: "integer", example: 1 },
+                        jobId: { type: "integer", example: 1 }
+                    }
                 }
-            }
-        },
-        JobInput: {
-  type: "object",
-  required: ["title", "country", "minExperience", "minLanguageScore"],
-  properties: {
-    title: {
-      type: "string",
-      example: "Enter job role (e.g., Electrician / Welder / Plumber)"
-    },
-    country: {
-      type: "string",
-      example: "Enter country name (e.g., Germany / UAE / Japan)"
-    },
-    minExperience: {
-      type: "integer",
-      example: 0
-    },
-    minLanguageScore: {
-      type: "integer",
-      example: 0
-    }
-  }
-},
-
-ApplicationInput: {
-  type: "object",
-  required: ["candidateId", "jobId"],
-  properties: {
-    candidateId: {
-      type: "integer",
-      example: 1
-    },
-    jobId: {
-      type: "integer",
-      example: 1
-    }
-  }
-},
-
-
             },
         },
     },

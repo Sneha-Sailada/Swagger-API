@@ -47,19 +47,29 @@ export class ApplicationService {
     }
 
     /**
-     * Lists applications for a job with custom sorting and pagination.
+     * Lists applications for a job with custom sorting, pagination, and status filtering.
      * 
      * Sorting Order (Business Rule 5.1):
      *   1. ELIGIBLE first
      *   2. Highest eligibilityScore (desc)
      *   3. Higher experience (desc)
      */
-    async getApplicationsByJob(jobId: string, page: number = 1, limit: number = 10) {
+    async getApplicationsByJob(
+        jobId: string,
+        page: number = 1,
+        limit: number = 10,
+        status?: ApplicationStatus
+    ) {
         // 1. Validate job existence
         await jobService.getJobById(jobId);
 
         // 2. Fetch all applications for this job
-        const applications = await applicationRepository.findByJobId(jobId);
+        let applications = await applicationRepository.findByJobId(jobId);
+
+        // 2.a Filter by status if provided
+        if (status) {
+            applications = applications.filter(app => app.status === status);
+        }
 
         // 3. Apply custom sorting logic (PRD Case 3 requirements)
         const sortedApplications = [...applications].sort((a: ApplicationWithCandidate, b: ApplicationWithCandidate) => {

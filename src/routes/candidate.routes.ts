@@ -40,6 +40,10 @@ router.post(
  *     responses:
  *       200:
  *         description: List of candidates
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiResponse'
  */
 router.get("/", candidateController.getAll);
 
@@ -58,6 +62,10 @@ router.get("/", candidateController.getAll);
  *     responses:
  *       200:
  *         description: Candidate found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiResponse'
  *       404:
  *         description: Candidate not found
  */
