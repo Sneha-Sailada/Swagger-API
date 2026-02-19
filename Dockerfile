@@ -5,18 +5,28 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-COPY . .
+# copy prisma and tsconfig BEFORE build
+COPY prisma ./prisma
+COPY tsconfig.json ./tsconfig.json
+
+RUN npx prisma generate
+
+# now copy source
+COPY src ./src
 
 RUN npm run build
 
-
-# ---------- Runner ----------
+# -------- Runner ----------
 FROM node:20-alpine
+
 WORKDIR /app
 
-COPY --from=builder /app ./
+RUN apk add --no-cache netcat-openbsd
 
-RUN npm install --omit=dev
+COPY --from=builder /app ./
+COPY docker-entrypoint.sh ./
+
+RUN chmod +x docker-entrypoint.sh
 
 EXPOSE 3000
 

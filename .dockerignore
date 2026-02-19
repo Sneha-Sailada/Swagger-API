@@ -1,12 +1,7 @@
 node_modules
 dist
 .env
-.env.docker
-npm-debug.log
-docker-compose.override.yml
 .git
 .gitignore
-README.md
-tests
-jest.config.ts
-tsconfig.json
+Dockerfile
+docker-compose.yml
