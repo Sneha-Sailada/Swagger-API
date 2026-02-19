@@ -1,0 +1,91 @@
+// Prisma Schema for Kovon Job Marketplace
+// ===========================================
+// Three entities: Candidate, Job, Application
+// Relationships: Application belongs to both Candidate and Job (M:N via join table)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -------------------------------------------------
+// ENUM: Application Status
+// -------------------------------------------------
+// We use a DB-level enum so invalid values are
+// impossible — not just at the app layer, but at
+// the database layer too.
+// -------------------------------------------------
+enum ApplicationStatus {
+  ELIGIBLE
+  REJECTED
+  SHORTLISTED
+}
+
+// -------------------------------------------------
+// MODEL: Candidate
+// -------------------------------------------------
+// Represents a blue/grey collar worker applying
+// for international job roles.
+// -------------------------------------------------
+model Candidate {
+  id                Int           @id @default(autoincrement())
+  name              String
+  skill             String
+  experience        Int           // years of experience (≥ 0)
+  languageScore     Int           // 0–100
+  documentsVerified Boolean       @default(false)
+  createdAt         DateTime      @default(now())
+
+  // Relation: a candidate can have many applications
+  applications      Application[]
+
+  @@map("candidates") // table name in PostgreSQL
+}
+
+// -------------------------------------------------
+// MODEL: Job
+// -------------------------------------------------
+// Represents an international job role with
+// minimum eligibility requirements.
+// -------------------------------------------------
+model Job {
+  id               Int           @id @default(autoincrement())
+  title            String
+  country          String
+  minExperience    Int           // minimum years required
+  minLanguageScore Int           // minimum language score required
+  createdAt        DateTime      @default(now())
+
+  // Relation: a job can have many applications
+  applications     Application[]
+
+  @@map("jobs")
+}
+
+// -------------------------------------------------
+// MODEL: Application
+// -------------------------------------------------
+// The join entity between Candidate and Job.
+// Contains computed eligibility data.
+// -------------------------------------------------
+model Application {
+  id                Int           @id @default(autoincrement())
+  candidateId       Int
+  jobId             Int
+  eligibilityScore Float             // pre-computed at creation time
+  status           ApplicationStatus // ELIGIBLE | REJECTED | SHORTLISTED
+  createdAt        DateTime          @default(now())
+
+  // Relations with foreign keys
+  candidate        Candidate         @relation(fields: [candidateId], references: [id])
+  job              Job               @relation(fields: [jobId], references: [id])
+
+  // Indexes for common queries
+  @@index([jobId])           // GET /applications?jobId=...
+  @@index([candidateId])     // future: GET candidate's applications
+  @@map("applications")
+}
