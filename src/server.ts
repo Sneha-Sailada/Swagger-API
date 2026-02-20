@@ -71,8 +71,7 @@ async function initializeInfrastructure() {
 }
 
 async function startServer() {
-  const server = app.listen(Number(PORT), "0.0.0.0", () => {
-    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+  app.listen(Number(PORT), "0.0.0.0", () => {
     console.log(`
 ╔══════════════════════════════════════════════╗
 ║   🚀  Kovon API Server                      ║
@@ -84,6 +83,7 @@ Health:    /health
 Environment: ${process.env.NODE_ENV || "production"}
       `);
   });
+
 
   // Handle health checks with DB status
   app.get("/health", (_req, res) => {
