@@ -20,12 +20,7 @@ const options: swaggerJsdoc.Options = {
                 name: "Kovon API Support",
             },
         },
-        servers: [
-            {
-                url: "http://localhost:3000",
-                description: "Development server",
-            },
-        ],
+        servers: [], // Let Swagger UI use the current host automatically
         components: {
             schemas: {
                 // Reusable response wrapper

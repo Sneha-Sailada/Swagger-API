@@ -17,19 +17,46 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import app from "./app";
+import prisma from "./config/prisma";
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+/**
+ * Retries database connection before starting the server.
+ * This prevents crash loops if the DB is booting up.
+ */
+async function startServer() {
+  let retries = 5;
+  while (retries > 0) {
+    try {
+      await prisma.$connect();
+      console.log("✅ Database connection established");
+      break;
+    } catch (err) {
+      retries -= 1;
+      console.error(`❌ Database connection failed. Retries left: ${retries}`);
+      if (retries === 0) {
+        console.error("Max retries reached. Exiting...");
+        process.exit(1);
+      }
+      await new Promise((res) => setTimeout(res, 5000));
+    }
+  }
+
+  app.listen(PORT, () => {
     console.log(`
 ╔══════════════════════════════════════════════╗
 ║   🚀  Kovon API Server                      ║
 ║                                              ║
-║   Server:    http://localhost:${PORT}           ║
-║   Swagger:   http://localhost:${PORT}/api-docs  ║
-║   Health:    http://localhost:${PORT}/health     ║
+║   Port:      ${PORT}                            ║
+║   Swagger:   /api-docs                       ║
+║   Health:    /health                         ║
 ║                                              ║
 ║   Environment: ${process.env.NODE_ENV || "development"}               ║
 ╚══════════════════════════════════════════════╝
-  `);
-});
+      `);
+  });
+}
+
+startServer();
+
