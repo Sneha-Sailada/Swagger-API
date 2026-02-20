@@ -26,24 +26,8 @@ const PORT = process.env.PORT || 3000;
  * This prevents crash loops if the DB is booting up.
  */
 async function startServer() {
-  let retries = 5;
-  while (retries > 0) {
-    try {
-      await prisma.$connect();
-      console.log("✅ Database connection established");
-      break;
-    } catch (err) {
-      retries -= 1;
-      console.error(`❌ Database connection failed. Retries left: ${retries}`);
-      if (retries === 0) {
-        console.error("Max retries reached. Exiting...");
-        process.exit(1);
-      }
-      await new Promise((res) => setTimeout(res, 5000));
-    }
-  }
-
-  app.listen(Number(PORT), "0.0.0.0", () => {
+  // 1. Start listening IMMEDIATELY so Railway health check passes
+  const server = app.listen(Number(PORT), "0.0.0.0", () => {
     console.log(`
 ╔══════════════════════════════════════════════╗
 ║   🚀  Kovon API Server                      ║
@@ -53,11 +37,33 @@ async function startServer() {
 ║   Swagger:   /api-docs                       ║
 ║   Health:    /health                         ║
 ║                                              ║
-║   Environment: ${process.env.NODE_ENV || "development"}               ║
+║   Environment: ${process.env.NODE_ENV || "production"}               ║
 ╚══════════════════════════════════════════════╝
       `);
   });
+
+  // 2. Connect to Database in the background
+  console.log("⏳ Connecting to database...");
+  let retries = 5;
+  while (retries > 0) {
+    try {
+      await prisma.$connect();
+      console.log("✅ Database connection established");
+      return;
+    } catch (err) {
+      retries -= 1;
+      console.error(`❌ Database connection failed. Retries left: ${retries}`);
+      if (retries === 0) {
+        console.error("Max retries reached. Shutting down server...");
+        server.close(() => process.exit(1));
+      }
+      await new Promise((res) => setTimeout(res, 5000));
+    }
+  }
 }
 
-startServer();
+startServer().catch((err) => {
+  console.error("💥 Fatal error during startup:", err);
+  process.exit(1);
+});
 
