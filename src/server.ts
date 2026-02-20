@@ -43,12 +43,13 @@ async function startServer() {
     }
   }
 
-  app.listen(PORT, () => {
+  app.listen(Number(PORT), "0.0.0.0", () => {
     console.log(`
 ╔══════════════════════════════════════════════╗
 ║   🚀  Kovon API Server                      ║
 ║                                              ║
 ║   Port:      ${PORT}                            ║
+║   Host:      0.0.0.0                         ║
 ║   Swagger:   /api-docs                       ║
 ║   Health:    /health                         ║
 ║                                              ║
